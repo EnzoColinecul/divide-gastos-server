@@ -1,6 +1,7 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const { generateJWT } = require('../helpers/generateJWT');
 
 const userLogin = async (req, res = response, next) => {
   const { email, password } = req.body;
@@ -23,11 +24,14 @@ const userLogin = async (req, res = response, next) => {
       });
     }
 
+    const token = await generateJWT(user.id, user.email);
+
     res.status(200).json({
       ok: true,
       uid: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
+      token,
     });
     return next();
   } catch (error) {
@@ -62,8 +66,14 @@ const userRegister = async (req, res = response, next) => {
     user.password = bcrypt.hashSync(password, salt);
     await user.save();
 
+    const token = await generateJWT(user.id, user.email);
+
     res.status(201).json({
       ok: true,
+      uid: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      token,
     });
   } catch (error) {
     error.type = 'register';
@@ -71,7 +81,24 @@ const userRegister = async (req, res = response, next) => {
   }
 };
 
+const renewToken = async (req, res = response, next) => {
+  const { uid, email } = req;
+  try {
+    const token = await generateJWT(uid, email);
+    res.status(200).json({
+      ok: true,
+      uid,
+      email,
+      token,
+    });
+  } catch (error) {
+    error.type = 'renew';
+    next(error);
+  }
+};
+
 module.exports = {
   userLogin,
   userRegister,
+  renewToken,
 };
