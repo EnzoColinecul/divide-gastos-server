@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "test": "mocha --recursive src/tests"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,8 @@
     "express": "^4.18.1",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.6.1"
+    "mongoose": "^6.6.1",
+    "supertest": "^6.3.3"
   },
   "devDependencies": {
     "eslint": "^8.23.1",
