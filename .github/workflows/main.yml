@@ -2,15 +2,22 @@ name: test_execute
 
 on:
   pull_request:
-    branches: "dev"
+    types: [opened, synchronize]
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+      MONGODB_DATABASE: ${{env.MONGODB_DATABASE}}
+      MONGODB_DOCKER_PORT: ${{env.MONGODB_DOCKER_PORT}}
+      MONGODB_LOCAL_PORT: ${{env.MONGODB_LOCAL_PORT}}
+      MONGODB_PASSWORD: ${{env.MONGODB_PASSWORD}}
+      MONGODB_USER: ${{env.MONGODB_USER}}
+      NODE_DOCKER_PORT: ${{env.NODE_DOCKER_PORT}}
+      NODE_LOCAL_PORT: ${{env.NODE_LOCAL_PORT}}
     steps:
       - uses: actions/checkout@v2
-      - name: Start docker compose
-        run: docker-compose up -d 
       - name: Install dependencies
         run: npm install
       - name: Run tests
