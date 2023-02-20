@@ -30,7 +30,7 @@ const UserSchema = new Schema({
     type: Array,
     default: null,
   },
-  activity: {
+  balances: {
     type: Array,
     default: null,
   },
