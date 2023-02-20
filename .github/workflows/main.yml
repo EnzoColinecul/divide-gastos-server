@@ -2,13 +2,15 @@ name: test_execute
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    branches: "dev"
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Start docker compose
+        run: docker-compose up -d 
       - name: Install dependencies
         run: npm install
       - name: Run tests
