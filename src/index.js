@@ -18,3 +18,5 @@ app.use('/api', require('./routes/router'));
 app.listen(process.env.NODE_DOCKER_PORT, () => {
   console.log(`server on port ${process.env.NODE_DOCKER_PORT}`);
 });
+
+module.exports = app;
