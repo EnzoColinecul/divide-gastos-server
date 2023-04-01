@@ -3,22 +3,34 @@ name: test_execute
 on:
   pull_request:
     types: [opened, synchronize]
+  
+env:
+    JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+    MONGODB_DATABASE: dividedb
+    MONGODB_DOCKER_PORT: 27017
+    MONGODB_LOCAL_PORT: 27018
+    MONGODB_PASSWORD: Identity$91
+    MONGODB_USER: root  
+    NODE_DOCKER_PORT: 6868
+    NODE_LOCAL_PORT: 8080
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-    env:
-      JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-      MONGODB_DATABASE: ${{env.MONGODB_DATABASE}}
-      MONGODB_DOCKER_PORT: ${{env.MONGODB_DOCKER_PORT}}
-      MONGODB_LOCAL_PORT: ${{env.MONGODB_LOCAL_PORT}}
-      MONGODB_PASSWORD: ${{env.MONGODB_PASSWORD}}
-      MONGODB_USER: ${{env.MONGODB_USER}}
-      NODE_DOCKER_PORT: ${{env.NODE_DOCKER_PORT}}
-      NODE_LOCAL_PORT: ${{env.NODE_LOCAL_PORT}}
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: npm install
+      - name: Start container
+        run: docker-compose up
       - name: Run tests
+        env:
+          MONGODB_DATABASE: ${{ env.MONGODB_DATABASE }}
+          MONGODB_DOCKER_PORT: ${{ env.MONGODB_DOCKER_PORT }}
+          MONGODB_LOCAL_PORT: ${{ env.MONGODB_LOCAL_PORT }}
+          MONGODB_PASSWORD: ${{ env.MONGODB_PASSWORD }}
+          MONGODB_USER: ${{ env.MONGODB_USER }}
+          NODE_DOCKER_PORT: ${{ env.NODE_DOCKER_PORT }}
+          NODE_LOCAL_PORT: ${{ env.NODE_LOCAL_PORT }}
         run: npm test
+
