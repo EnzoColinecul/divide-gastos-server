@@ -19,7 +19,7 @@ const handlingErrors = (error, req, res, next) => {
       errorResponse('Error in login controller');
       break;
     case 'register':
-      errorResponse('Error in register');
+      errorResponse('Error in register controller');
       break;
     default:
       next();
