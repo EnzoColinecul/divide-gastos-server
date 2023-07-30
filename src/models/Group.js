@@ -8,9 +8,9 @@ const groupSchema = new Schema({
   description: {
     type: String,
   },
-  owner: {
-    type: String,
-    required: true,
+  owners: {
+    type: Array,
+    required: false,
   },
   members: {
     type: Array,

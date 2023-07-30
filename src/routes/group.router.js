@@ -32,7 +32,7 @@ router.get('/:id', (req, res) => {
 
 router.post('/create', [
   check('name', 'Name is required').notEmpty(),
-  check('owner', 'Owner is required').notEmpty(),
+  check('members', 'Members is required').notEmpty(),
   validateFields,
 ], groupCreate);
 

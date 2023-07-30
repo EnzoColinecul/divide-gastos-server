@@ -21,7 +21,7 @@ router.post(
   [
     check('firstName', 'First Name is required').isString(),
     check('lastName', 'Last Name is required').isString(),
-    check('email', 'Email is required').isEmail(),
+    check('email', 'Email is requiredx').isEmail(),
     check('password', 'Password must be greater than or equal to 8 character').isLength({ min: 7 }),
     check('password', 'Must include numbers. Use a combination of uppercase and lowercase letters. Includes special characters.').isStrongPassword(),
     validateFields,

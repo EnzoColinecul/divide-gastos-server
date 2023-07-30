@@ -34,6 +34,25 @@ const UserSchema = new Schema({
     type: Array,
     default: null,
   },
+  userType: {
+    type: String,
+    required: true,
+    default: 'standard',
+    enum: ['standard', 'premium'],
+  },
+  verificatedEmail: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
+
+UserSchema.methods.toJSON = function () {
+  const {
+    __v, password, _id, ...user
+  } = this.toObject();
+  user.uid = _id;
+  return user;
+};
 
 module.exports = model('User', UserSchema);

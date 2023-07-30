@@ -27,10 +27,7 @@ const userLogin = async (req, res = response, next) => {
     const token = await generateJWT(user.id, user.email);
 
     res.status(200).json({
-      ok: true,
-      uid: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      user,
       token,
     });
     return next();
@@ -50,7 +47,7 @@ const userRegister = async (req, res = response, next) => {
     if (user) {
       res.status(400).json({
         ok: false,
-        msg: 'User already exists with that email',
+        msg: 'User already exists',
       });
     }
 
