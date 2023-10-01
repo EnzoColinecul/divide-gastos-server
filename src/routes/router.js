@@ -5,7 +5,9 @@ const app = express();
 
 app.use('/auth', require('./auth.router'));
 
-app.use('/groups', require('./group.router'));
+app.use('/group', require('./group.router'));
+
+app.use('/user', require('./user.router'));
 
 app.use(handlingErrors);
 
