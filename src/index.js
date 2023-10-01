@@ -15,6 +15,8 @@ app.use(cors());
 
 app.use('/api', require('./routes/router'));
 
-app.listen(process.env.NODE_DOCKER_PORT, '172.19.0.3');
+app.listen(process.env.NODE_DOCKER_PORT, () => {
+  console.log(`Server running on port ${process.env.NODE_DOCKER_PORT}`);
+});
 
 module.exports = app;

@@ -2,6 +2,7 @@ const { response } = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { generateJWT } = require('../helpers/generateJWT');
+const Group = require('../models/Group');
 
 const userLogin = async (req, res = response, next) => {
   const { email, password } = req.body;
@@ -25,7 +26,9 @@ const userLogin = async (req, res = response, next) => {
     }
 
     const token = await generateJWT(user.id, user.email);
-
+    const groups = await Group.find({ members: user.id });
+    user.groups = groups;
+    user.groupsOwner = groups.filter((group) => group.owners.includes(user.id));
     res.status(200).json({
       user,
       token,
@@ -67,7 +70,7 @@ const userRegister = async (req, res = response, next) => {
 
     res.status(201).json({
       ok: true,
-      uid: user.id,
+      userId: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       token,
@@ -79,12 +82,12 @@ const userRegister = async (req, res = response, next) => {
 };
 
 const renewToken = async (req, res = response, next) => {
-  const { uid, email } = req;
+  const { userId, email } = req;
   try {
-    const token = await generateJWT(uid, email);
+    const token = await generateJWT(userId, email);
     res.status(200).json({
       ok: true,
-      uid,
+      userId,
       email,
       token,
     });
