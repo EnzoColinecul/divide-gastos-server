@@ -67,7 +67,7 @@ const userRegister = async (req, res = response, next) => {
     user.password = bcrypt.hashSync(password, salt);
 
     const token = await generateJWT(user.id, user.email);
-    const emailLink = `${process.env.BASE_URL}/verify-email/${user.id}/${token}}`;
+    const emailLink = `${process.env.BASE_URL}/verify-email/${user.id}/${token}`;
     const sendEmail = await sendMail(
       email,
       'Divide Gastos App - Confirm your email',
@@ -137,7 +137,7 @@ const resendEmail = async (req, res = response, next) => {
 
 const verifyEmail = async (req, res = response, next) => {
   try {
-    const { userId, token } = req.params;
+    const { userId } = req.params;
     const user = await User.findById(userId);
     if (!user) {
       res.status(400).json({
