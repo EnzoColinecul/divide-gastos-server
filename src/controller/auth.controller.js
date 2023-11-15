@@ -36,7 +36,6 @@ const userLogin = async (req, res = response, next) => {
     });
     return next();
   } catch (error) {
-    error.type = 'login';
     return next(error);
   }
 };
@@ -88,7 +87,6 @@ const userRegister = async (req, res = response, next) => {
       lastName: user.lastName,
     });
   } catch (error) {
-    error.type = 'register';
     next(error);
   }
 };
@@ -130,7 +128,6 @@ const resendEmail = async (req, res = response, next) => {
       msg: 'Email sent',
     });
   } catch (error) {
-    error.type = 'resendEmail';
     next(error);
   }
 };
@@ -160,7 +157,6 @@ const verifyEmail = async (req, res = response, next) => {
       msg: 'Email verified',
     });
   } catch (error) {
-    error.type = 'verifyEmail';
     next(error);
   }
 };
@@ -176,7 +172,6 @@ const renewToken = async (req, res = response, next) => {
       token,
     });
   } catch (error) {
-    error.type = 'renew';
     next(error);
   }
 };

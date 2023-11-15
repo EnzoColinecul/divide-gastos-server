@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const { response } = require('../routes/router');
 
-const getUserById = async (req, res = response) => {
+const getUserById = async (req, res = response, next) => {
   try {
     const uid = req.params.id;
     const user = await User.findOne({ uid });
@@ -17,12 +17,8 @@ const getUserById = async (req, res = response) => {
       user,
     });
   } catch (error) {
-    error.status = 500;
+    next(error);
   }
-  return res.status(500).json({
-    ok: false,
-    msg: 'Internal server error',
-  });
 };
 
 module.exports = { getUserById };

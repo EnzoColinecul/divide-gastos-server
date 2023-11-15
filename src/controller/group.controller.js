@@ -5,7 +5,7 @@ const { response } = require('../routes/router');
 
 const removeDuplicates = (array) => array.filter((item, index) => array.indexOf(item) === index);
 
-const groupCreate = async (req, res = response) => {
+const groupCreate = async (req, res = response, next) => {
   const { members } = req.body;
   const newGroup = new Group(req.body);
   const findMembers = await Users.find({ email: { $in: members } });
@@ -31,11 +31,11 @@ const groupCreate = async (req, res = response) => {
       group,
     });
   } catch (error) {
-    throw new Error(error);
+    next(error);
   }
 };
 
-const updateGroup = async (req, res = response) => {
+const updateGroup = async (req, res = response, next) => {
   const { userId } = req;
   const { id } = req.params;
   const { name, description, members } = req.body;
@@ -81,11 +81,11 @@ const updateGroup = async (req, res = response) => {
       newGroup,
     });
   } catch (error) {
-    throw new Error(error);
+    next(error);
   }
 };
 
-const getGroupById = async (req, res = response) => {
+const getGroupById = async (req, res = response, next) => {
   const { id } = req.params;
   try {
     if (!verifyId(id)) {
@@ -107,11 +107,11 @@ const getGroupById = async (req, res = response) => {
       getGroup,
     });
   } catch (error) {
-    throw new Error(error);
+    next(error);
   }
 };
 
-const deleteGroupById = async (req, res = response) => {
+const deleteGroupById = async (req, res = response, next) => {
   const { id } = req.params;
   try {
     if (!verifyId(id)) {
@@ -139,7 +139,7 @@ const deleteGroupById = async (req, res = response) => {
       group,
     });
   } catch (error) {
-    throw new Error(error);
+    next(error);
   }
 };
 
