@@ -1,7 +1,9 @@
-const { response } = require('express');
 const bcrypt = require('bcryptjs');
+const { response } = require('express');
 const User = require('../models/User');
+const Group = require('../models/Group');
 const { generateJWT } = require('../helpers/generateJWT');
+const sendMail = require('../services/email/emailSender');
 
 const userLogin = async (req, res = response, next) => {
   const { email, password } = req.body;
@@ -25,17 +27,15 @@ const userLogin = async (req, res = response, next) => {
     }
 
     const token = await generateJWT(user.id, user.email);
-
+    const groups = await Group.find({ members: user.id });
+    user.groups = groups;
+    user.groupsOwner = groups.filter((group) => group.owners.includes(user.id));
     res.status(200).json({
-      ok: true,
-      uid: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      user,
       token,
     });
     return next();
   } catch (error) {
-    error.type = 'login';
     return next(error);
   }
 };
@@ -50,7 +50,7 @@ const userRegister = async (req, res = response, next) => {
     if (user) {
       res.status(400).json({
         ok: false,
-        msg: 'User already exists with that email',
+        msg: 'User already exists',
       });
     }
 
@@ -64,35 +64,114 @@ const userRegister = async (req, res = response, next) => {
     user = new User(req.body);
     const salt = bcrypt.genSaltSync();
     user.password = bcrypt.hashSync(password, salt);
-    await user.save();
 
     const token = await generateJWT(user.id, user.email);
+    const emailLink = `${process.env.BASE_URL}/verify-email/${user.id}/${token}`;
+    const sendEmail = await sendMail(
+      email,
+      'Divide Gastos App - Confirm your email',
+      `Click on the link to confirm your email: ${emailLink}`,
+    );
 
+    if (!sendEmail) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error sending verification email',
+      });
+    }
+    await user.save();
     res.status(201).json({
       ok: true,
-      uid: user.id,
+      userId: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      token,
     });
   } catch (error) {
-    error.type = 'register';
+    next(error);
+  }
+};
+
+const resendEmail = async (req, res = response, next) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({
+        ok: false,
+        msg: 'User not found',
+      });
+    }
+
+    if (user.verificatedEmail) {
+      res.status(400).json({
+        ok: false,
+        msg: 'Email already verified',
+      });
+    }
+
+    const token = await generateJWT(user.id, user.email);
+    const emailLink = `${process.env.BASE_URL}/verify-email/${user.id}/${token}}`;
+    const sendEmail = await sendMail(
+      email,
+      'Divide Gastos App - Confirm your email',
+      `Click on the link to confirm your email: ${emailLink}`,
+    );
+
+    if (!sendEmail) {
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error sending verification email',
+      });
+    }
+    res.status(200).json({
+      ok: true,
+      msg: 'Email sent',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyEmail = async (req, res = response, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(400).json({
+        ok: false,
+        msg: 'User not found',
+      });
+    }
+
+    if (user.verificatedEmail) {
+      res.status(400).json({
+        ok: false,
+        msg: 'Email already verified',
+      });
+    }
+
+    user.verificatedEmail = true;
+    await user.save();
+    res.status(200).json({
+      ok: true,
+      msg: 'Email verified',
+    });
+  } catch (error) {
     next(error);
   }
 };
 
 const renewToken = async (req, res = response, next) => {
-  const { uid, email } = req;
+  const { userId, email } = req;
   try {
-    const token = await generateJWT(uid, email);
+    const token = await generateJWT(userId, email);
     res.status(200).json({
       ok: true,
-      uid,
+      userId,
       email,
       token,
     });
   } catch (error) {
-    error.type = 'renew';
     next(error);
   }
 };
@@ -101,4 +180,6 @@ module.exports = {
   userLogin,
   userRegister,
   renewToken,
+  verifyEmail,
+  resendEmail,
 };
