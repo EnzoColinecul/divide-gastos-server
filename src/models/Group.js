@@ -1,15 +1,17 @@
 const { Schema, model } = require('mongoose');
 
-const groupSchema = new Schema({
+const GroupSchema = new Schema({
   name: {
     type: String,
     required: true,
   },
   description: {
     type: String,
+    required: false,
+    default: null,
   },
-  owner: {
-    type: String,
+  owners: {
+    type: Array,
     required: true,
   },
   members: {
@@ -22,4 +24,12 @@ const groupSchema = new Schema({
   },
 });
 
-module.exports = model('Group', groupSchema);
+GroupSchema.methods.toJSON = function () {
+  const {
+    __v, _id, ...group
+  } = this.toObject();
+  group.groupId = _id;
+  return group;
+};
+
+module.exports = model('Group', GroupSchema);

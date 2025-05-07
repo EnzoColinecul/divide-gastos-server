@@ -14,8 +14,8 @@ const validateJWT = (req, res = response, next) => {
   }
 
   try {
-    const { uid, email } = jwt.verify(token, JWT_SECRET_KEY);
-    req.uid = uid;
+    const { userId, email } = jwt.verify(token, JWT_SECRET_KEY);
+    req.userId = userId;
     req.email = email;
   } catch (error) {
     error.type = 'token';
@@ -25,4 +25,23 @@ const validateJWT = (req, res = response, next) => {
   next();
 };
 
-module.exports = { validateJWT };
+const validateJWTparams = (req, res = response, next) => {
+  const { token } = req.params;
+
+  try {
+    jwt.verify(token, JWT_SECRET_KEY, (err) => {
+      if (err) {
+        res.status(401).json({
+          ok: false,
+          msg: 'Invalid Link',
+        });
+      }
+    });
+  } catch (error) {
+    error.type = 'token';
+    next(error);
+  }
+  next();
+};
+
+module.exports = { validateJWT, validateJWTparams };
